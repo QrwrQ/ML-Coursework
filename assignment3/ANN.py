@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import math
 import logging
+import random
 
 
 logging.basicConfig(level=logging.INFO)
@@ -52,9 +53,11 @@ class ANN:
         else:
             return True
     # create notwork
-    def create(self):
+    def create(self,seed=None):
         if not self.__isValid():
             raise Exception('No set!')
+        if seed!=None:
+            random.seed(seed)
         input_num=self.__input_num
         output_num=self.__output_num
         hidden_info=self.__hidden_num
@@ -74,16 +77,16 @@ class ANN:
 
         layer_last=None
         for i in range(hidden_num):
-            b=tf.Variable(tf.random_normal([hidden_info[i]]))
+            b=tf.Variable(tf.random_normal([hidden_info[i]],seed=random.randint(-1000,1000)))
             if i==0:
-                w=tf.Variable(tf.random_normal([input_num, hidden_info[i]]))
+                w=tf.Variable(tf.random_normal([input_num, hidden_info[i]],seed=random.randint(-1000,1000)))
                 layer_last=activationFunction[i](tf.add(tf.matmul(X, w), b))
             else:
-                w=tf.Variable(tf.random_normal([hidden_info[i-1], hidden_info[i]]))
+                w=tf.Variable(tf.random_normal([hidden_info[i-1], hidden_info[i]],seed=random.randint(-1000,1000)))
                 layer_last=activationFunction[i](tf.add(tf.matmul(layer_last, w), b))
 
-        b=tf.Variable(tf.random_normal([output_num]))
-        w=tf.Variable(tf.random_normal([hidden_info[-1], output_num]))
+        b=tf.Variable(tf.random_normal([output_num],seed=random.randint(-1000,1000)))
+        w=tf.Variable(tf.random_normal([hidden_info[-1], output_num],seed=random.randint(-1000,1000)))
         if self.__output_layer_active_function==None:
             self.__neural_network=tf.add(tf.matmul(layer_last, w),b)
         else:
@@ -309,7 +312,7 @@ class SampleManager:
 if __name__=='__main__':
     import matplotlib.pyplot as plt
     #读取数据
-    data=np.loadtxt('数据\\forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
+    data=np.loadtxt('F:\\Msc诺丁汉\\秋季\\机器学习\\cw3\\python代码\\数据\\forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
     feature=data[:,0:8]
     label=np.log(data[:,8]+1)
     # label=data[:,8]
@@ -326,7 +329,7 @@ if __name__=='__main__':
     ann.setActivationFunction([tf.nn.tanh,tf.nn.sigmoid])#自定义激活函数
     ann.setLossType(ANN.SQUARED_DIFFERENCE)# ANN.SQUARED_DIFFERENCE适用于回归 ANN.SOFTMAX_CROSS_ENTROPY适用于分类
     ann.setHyperparameter(0.01,5000)#自定义learn_rate 和 number_epochs
-    ann.create()
+    ann.create(666)
 
     #训练
     #得到标准化后特征（也可不用标准化，看模型效果决定是否标准化）SampleManager.ZSCORE
