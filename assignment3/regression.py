@@ -3,7 +3,7 @@ import numpy as np
 from ANN import *
 import matplotlib.pyplot as plt
 
-data=np.loadtxt('F:\\Msc诺丁汉\\秋季\\机器学习\\cw3\\python代码\\数据\\forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
+data=np.loadtxt('forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
 feature=data[:,0:8]
 label=np.log(data[:,8]+1)
 simple=SampleManager(feature,label.T)

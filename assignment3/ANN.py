@@ -311,39 +311,38 @@ class SampleManager:
 
 if __name__=='__main__':
     import matplotlib.pyplot as plt
-    #读取数据
-    data=np.loadtxt('F:\\Msc诺丁汉\\秋季\\机器学习\\cw3\\python代码\\数据\\forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
+    #read data
+    data=np.loadtxt('forestfires.csv',skiprows=1,usecols=range(4,13),delimiter=',')
     feature=data[:,0:8]
     label=np.log(data[:,8]+1)
-    # label=data[:,8]
     simple=SampleManager(feature,label.T)
 
-    #划分训练集验证集和测试集
+    #Divide training set validation set and test set
     experimental_data=simple.getExperimentalData()
     train_data=experimental_data['train_data']
     validation_data=experimental_data['validation_data']
     test_data=experimental_data['test_data']
 
-    #创建ANN
+    #create ANN
     ann=ANN(8,1,[15,15])#自定义输入、输出、隐藏层
     ann.setActivationFunction([tf.nn.tanh,tf.nn.sigmoid])#自定义激活函数
     ann.setLossType(ANN.SQUARED_DIFFERENCE)# ANN.SQUARED_DIFFERENCE适用于回归 ANN.SOFTMAX_CROSS_ENTROPY适用于分类
     ann.setHyperparameter(0.01,5000)#自定义learn_rate 和 number_epochs
     ann.create(666)
 
-    #训练
-    #得到标准化后特征（也可不用标准化，看模型效果决定是否标准化）SampleManager.ZSCORE
+    #train
+    #Normalized feature
     train_featurn=train_data.getFeature(SampleManager.ZSCORE)
     validation_feature=validation_data.getFeature(SampleManager.ZSCORE)
     test_feature=test_data.getFeature(SampleManager.ZSCORE)
-    #开始训练模型
+    #start train
     train_info=ann.start(train_featurn,train_data.getLabel(),10,validation_feature,validation_data.getLabel())
-    #将训练信息可视化
+    #plot
     plt.plot(train_info[1], 'r.-', train_info[2], 'b.-')
     plt.legend(('train accuracy','validation accuracy'),loc='upper left')
     plt.show()
 
-    #查看该模型在测试集上的表现
+    #plot prediction
     pred=ann.predict(test_feature)
     print(getRMSE(pred,test_data.getLabel()))
     plt.plot(test_data.getLabel(), 'ro', pred, 'bo')
